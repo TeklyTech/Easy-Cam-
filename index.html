@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyCam - Effortless Screen Recording</title>
+    <link rel="ico" href="logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-glow: #a855f7;
+            --secondary-glow: #ec4899;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --surface-glass: rgba(30, 30, 50, 0.4);
+            --surface-glass-light: rgba(255, 255, 255, 0.1);
+            --surface-border: rgba(255, 255, 255, 0.15);
+            --bg-gradient-start: #110d21;
+            --bg-gradient-end: #1e1b4b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-gradient-start);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            background-size: 200% 200%;
+            animation: gradient-flow 20s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* --- Navigation Bar --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 0;
+            z-index: 100;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .navbar.scrolled {
+            background: rgba(17, 13, 33, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--surface-border);
+        }
+
+        .nav-container { display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-primary); }
+        .nav-logo img { height: 35px; }
+        .nav-logo span { font-size: 1.5rem; font-weight: 700; }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+        
+        /* --- Hero Section --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            padding-top: 5rem;
+        }
+        .hero-content { width: 100%; max-width: 800px; margin: 0 auto; }
+        .hero-visual { margin-bottom: 2rem; perspective: 1000px; }
+        .hero-visual img {
+            max-width: 80%;
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: float 8s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateZ(0) rotateX(10deg) rotateY(-10deg); }
+            50% { transform: translateZ(20px) rotateX(-5deg) rotateY(10deg); }
+            100% { transform: translateZ(0) rotateX(10deg) rotateY(-10deg); }
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            text-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+        }
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 1.5rem auto 2.5rem;
+        }
+        .cta-buttons { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .btn {
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            color: white;
+            box-shadow: 0 0 15px 0px var(--primary-glow), 0 0 25px 0px var(--secondary-glow);
+            animation: pulse-glow 3s infinite alternate;
+        }
+        .btn:hover { transform: scale(1.05); }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--surface-border);
+        }
+        .btn-secondary:hover { background-color: var(--surface-glass); border-color: var(--text-primary); }
+
+        /* --- Features & Preview Sections --- */
+        .features, .preview-section, .final-cta { padding: 6rem 0; }
+        .section-title { text-align: center; margin-bottom: 4rem; }
+        .section-title h2 { font-size: 2.5rem; font-weight: 700; }
+        .section-title p { font-size: 1.1rem; color: var(--text-secondary); max-width: 500px; margin: 0.5rem auto 0; }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        .feature-card {
+            background: var(--surface-glass);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature-card:hover { transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .feature-card .icon { width: 50px; height: 50px; margin-bottom: 1.5rem; color: var(--primary-glow); }
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .feature-card p { color: var(--text-secondary); line-height: 1.6; }
+
+        /* --- Preview Section --- */
+        .image-switcher { display: flex; flex-direction: column; align-items: center; gap: 2rem; }
+        .switcher-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+        .switcher-btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            background: var(--surface-glass);
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            border: 1px solid var(--surface-border);
+        }
+        .switcher-btn:hover { background: var(--surface-glass-light); color: var(--text-primary); }
+        .switcher-btn.active {
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            color: white;
+            box-shadow: 0 0 15px 0px var(--primary-glow);
+            border-color: transparent;
+        }
+        .image-display {
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--surface-border);
+            background: #000;
+        }
+        #previewImage {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        /* --- Final CTA & Footer --- */
+        .final-cta { text-align: center; }
+        .final-cta h2 { font-size: 2.5rem; max-width: 600px; margin: 0 auto 1.5rem; }
+        .footer {
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--surface-border);
+        }
+
+        /* --- Scroll Animations --- */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero-visual img { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-gradient"></div>
+
+    <header class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#" class="nav-logo">
+                <img src="logo.png" alt="EasyCam Logo">
+                <span>EasyCam</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#previews">Previews</a>
+                <a href="#download">Download</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container hero-content">
+                <div class="hero-visual animate-on-scroll">
+                </div>
+                <h1 class="animate-on-scroll" style="transition-delay: 100ms;">The Easiest Way to Capture Your Screen.</h1>
+                <p class="animate-on-scroll" style="transition-delay: 200ms;">A modern, ultra-light screen recorder for Windows and your browser. No fuss, just instant, high-quality recording.</p>
+                <div class="cta-buttons animate-on-scroll" style="transition-delay: 300ms;">
+                    <a href="download.html" download="logo.png" class="btn btn-primary"> 
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download for Windows
+                    </a>
+                    <a href="https://teklytech.github.io/EasyCam/" class="btn btn-secondary">Use Web Version</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features" id="features">
+            <div class="container">
+                <div class="section-title animate-on-scroll">
+                    <h2>Everything You Need. Nothing You Don't.</h2>
+                    <p>EasyCam is built on a foundation of simplicity and speed, designed to get out of your way and let you focus on creating.</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card animate-on-scroll">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" /></svg>
+                        <h3>One-Click Recording</h3>
+                        <p>Start and stop recordings instantly with a single click. The simple UI makes capturing your screen completely intuitive.</p>
+                    </div>
+                    <div class="feature-card animate-on-scroll" style="transition-delay: 100ms;">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-1.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25z" /></svg>
+                        <h3>Sleek & Modern UI</h3>
+                        <p>Enjoy a beautiful, dark-mode interface with subtle gradients and glassmorphism that's easy on the eyes and a pleasure to use.</p>
+                    </div>
+                    <div class="feature-card animate-on-scroll" style="transition-delay: 200ms;">
+                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>
+                        <h3>Lightweight & Fast</h3>
+                        <p>Built for performance. EasyCam is incredibly light on system resources, ensuring smooth recording without slowing down your computer.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="preview-section" id="previews">
+            <div class="container">
+                <div class="section-title animate-on-scroll">
+                    <h2>See The App In Action</h2>
+                    <p>Switch between views to see how EasyCam streamlines the recording process from start to finish.</p>
+                </div>
+                <div class="image-switcher animate-on-scroll" style="transition-delay: 100ms;">
+                    <div class="switcher-buttons">
+                        <button class="switcher-btn active" data-image="img1.png">Initial State</button>
+                        <button class="switcher-btn" data-image="img2.png">Recording Settings</button>
+                        <button class="switcher-btn" data-image="img3.png"> Preview And Download</button>
+                    </div>
+                    <div class="image-display">
+                        <img src="img1.png" alt="EasyCam initial state" id="previewImage">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="final-cta" id="download">
+            <div class="container">
+                <h2 class="animate-on-scroll">Ready to Simplify Your Workflow?</h2>
+                <div class="cta-buttons animate-on-scroll" style="transition-delay: 100ms;">
+                     <a href="download.html" class="btn btn-primary n">Download for Windows</a>
+                     <a href="https://teklytech.github.io/EasyCam/" class="btn btn-secondary">Use Web Version</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 Tekly . All Rights Reserved. Built for a better workflow.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Sticky Navbar ---
+        const navbar = document.getElementById('navbar');
+        window.onscroll = () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        };
+
+        // --- Scroll Animations ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
+        elementsToAnimate.forEach((el) => observer.observe(el));
+
+        // --- Preview Image Switcher ---
+        const switcherButtons = document.querySelectorAll('.switcher-btn');
+        const previewImage = document.getElementById('previewImage');
+
+        switcherButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (button.classList.contains('active')) return;
+
+                document.querySelector('.switcher-btn.active').classList.remove('active');
+                button.classList.add('active');
+
+                const newImageSrc = button.dataset.image;
+                previewImage.style.opacity = '0';
+
+                setTimeout(() => {
+                    previewImage.src = newImageSrc;
+                    previewImage.alt = `EasyCam preview: ${button.textContent}`;
+                    previewImage.style.opacity = '1';
+                }, 400);
+            });
+        });
+
+        // --- Download Logic for 'img.png' ---
+        const downloadButtons = document.querySelectorAll('.js-download-btn');
+        downloadButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                // 1. Prevent the link from redirecting immediately
+                event.preventDefault();
+
+                // 2. Define the path to the file you want to download
+                const filePath = 'img.png';
+
+                // 3. Create a temporary, hidden link element
+                const tempLink = document.createElement('a');
+                tempLink.href = filePath;
+                tempLink.setAttribute('download', 'img.png'); // Sets the filename for the user
+                tempLink.style.display = 'none';
+                document.body.appendChild(tempLink);
+
+                // 4. Programmatically click the hidden link to start the download
+                tempLink.click();
+
+                // 5. Remove the temporary link from the page
+                document.body.removeChild(tempLink);
+
+                // 6. After a short delay, redirect to the "Thank You" page
+                setTimeout(() => {
+                    window.location.href = this.href; // 'this.href' is 'download.html' from the <a> tag
+                }, 500); // 0.5 second delay
+            });
+        });
+    </script>
+
+</body>
+</html>
